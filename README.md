@@ -35,6 +35,7 @@ This mini-project demonstrates how to use FastAPI to create an application for s
 
      - Replace `<your-github-token>` with your GitHub token. This token will allow you to access the models in the GitHub Marketplace, like AI21 Jambo 1.5 Mini.
      - Replace `<your-openai-api-key>` with your OpenAI API key. This key is necessary for accessing the OpenAI Whisper model.
+     - Replace `<your_postgres_db_url>` with your PostgreSQL database URL.
 
 4. **Start the FastAPI server**:
 
