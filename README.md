@@ -30,6 +30,7 @@ This mini-project demonstrates how to use FastAPI to create an application for s
      ```bash
      GITHUB_TOKEN=<your-github-token>
      OPENAI_API_KEY=<your-openai-api-key>
+     DB_URL=<your_postgres_db_url>
      ```
 
      - Replace `<your-github-token>` with your GitHub token. This token will allow you to access the models in the GitHub Marketplace, like AI21 Jambo 1.5 Mini.
