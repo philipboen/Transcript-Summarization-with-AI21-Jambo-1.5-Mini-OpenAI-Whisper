@@ -1,0 +1,9 @@
+fastapi
+python-dotenv
+azure-ai-inference
+pytube
+uvicorn
+youtube-transcript-api
+pydantic
+python-multipart
+openai
