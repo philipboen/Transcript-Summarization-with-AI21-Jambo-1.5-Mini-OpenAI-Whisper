@@ -46,6 +46,6 @@ This mini-project demonstrates how to use FastAPI to create an application for s
    This will start the FastAPI server, and you can access the application at `http://localhost:8000`.
 
 5. **Test the application**:
-   - Open the Swagger UI at `http://localhost:8000/docs`.
+   - Open the Swagger UI at `http://localhost:8000/docs`, or you can use Postman or curl to test the application.
    - Paste a YouTube video link or upload an audio file. There is a sample audio file in the `/audio/test` directory.
    - The application will return a summary of the transcript.
