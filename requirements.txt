@@ -7,3 +7,10 @@ youtube-transcript-api
 pydantic
 python-multipart
 openai
+SQLAlchemy
+sqlalchemy-utils
+pgvector
+pydub
+psycopg2
+nltk
+tiktoken
