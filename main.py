@@ -9,11 +9,7 @@ from azure.ai.inference.models import SystemMessage, UserMessage
 from azure.core.credentials import AzureKeyCredential
 from background_task import process_video_transcript, process_audio_transcription
 from db import get_db, Video, Audio, AudioChunk
-from utils.token_utils import (
-    count_tokens,
-    smart_chunk_selection,
-    truncate_to_token_limit,
-)
+from utils.token_utils import count_tokens, smart_chunk_selection
 
 app = FastAPI()
 
@@ -147,21 +143,20 @@ async def getAudioTranscriptionStatus(audio_id: str, db: Session = Depends(get_d
         raise HTTPException(status_code=404, detail="Audio not found")
 
     if audio.status == "completed":
-        # Check if we have chunks
-        chunks = db.query(AudioChunk).filter(AudioChunk.audio_id == audio_id).all()
+        transcript_text = audio.transcript
+        token_count = count_tokens(transcript_text)
+        print(f"Transcript length: {token_count} tokens")
 
-        if chunks:
-            # Use smart chunk selection
-            transcript_text = smart_chunk_selection(chunks)
-        else:
-            # Fallback to full transcript with token check
-            print("Using fallback chunk selection")
-            transcript_text = audio.transcript
-            if count_tokens(transcript_text) > 7000:
-                # Take first portion that fits
-                transcript_text = truncate_to_token_limit(transcript_text, 7000)
-
-        print(f"Transcript length: {count_tokens(transcript_text)} tokens")
+        if token_count > 8000:
+            chunks = db.query(AudioChunk).filter(AudioChunk.audio_id == audio_id).all()
+            if chunks:
+                transcript_text = smart_chunk_selection(chunks)
+            else:
+                print("Warning: Long transcript with no chunks available")
+                return {
+                    "status": "error",
+                    "message": "Transcript too long for processing",
+                }
 
         response = client.complete(
             messages=[
