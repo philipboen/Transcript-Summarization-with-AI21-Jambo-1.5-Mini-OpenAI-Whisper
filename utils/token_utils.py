@@ -1,33 +1,16 @@
 from typing import List, Tuple
-import tiktoken
 from db import AudioChunk
+from ai21 import tokenizers
 
 
-def count_tokens(text: str, model: str = "gpt-4o") -> int:
-    """Accurate token counting using tiktoken"""
-    encoder = tiktoken.encoding_for_model(model)
-    return len(encoder.encode(text))
+def count_tokens(text: str) -> int:
+    """Count tokens using AI21 tokenizer"""
+    tokenizer = tokenizers.get_tokenizer()
+    tokens = tokenizer.tokenize(text)
+    return len(tokens)
 
 
-def truncate_to_token_limit(text: str, max_tokens: int = 7000) -> str:
-    """Truncate text to stay within token limit while keeping whole sentences"""
-    if count_tokens(text) <= max_tokens:
-        return text
-
-    encoder = tiktoken.encoding_for_model("gpt-4o")
-    tokens = encoder.encode(text)
-    truncated_tokens = tokens[:max_tokens]
-    truncated_text = encoder.decode(truncated_tokens)
-
-    # Try to end at a sentence boundary
-    last_period = truncated_text.rfind(".")
-    if last_period > 0:
-        truncated_text = truncated_text[: last_period + 1]
-
-    return truncated_text
-
-
-def smart_chunk_selection(chunks: List[AudioChunk], max_tokens: int = 7000) -> str:
+def smart_chunk_selection(chunks: List[AudioChunk], max_tokens: int = 8000) -> str:
     """Smart chunk selection using embeddings and relevance scoring"""
 
     # Calculate average embedding as centroid
