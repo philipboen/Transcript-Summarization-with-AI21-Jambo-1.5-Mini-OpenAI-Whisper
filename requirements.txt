@@ -13,4 +13,4 @@ pgvector
 pydub
 psycopg2
 nltk
-tiktoken
+ai21>=2.13.0
