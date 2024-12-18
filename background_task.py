@@ -8,6 +8,7 @@ import math
 from dotenv import load_dotenv
 from utils.chunk_text import chunk_text
 from utils.create_embedding import create_embedding
+from utils.token_utils import count_tokens
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -101,24 +102,12 @@ def process_audio_transcription(file_location: str, audio_id: str, db: Session):
             audio_record.transcript = final_transcript
             audio_record.status = "completed"
 
-            # Check transcript length
-            estimated_tokens = len(final_transcript) // 4
-            if estimated_tokens > 7000:
-                print("Transcript exceeds token limit, creating chunks...")
-                chunks = chunk_text(final_transcript)
-                for chunk in chunks:
-                    embedding = create_embedding(chunk)
-                    chunk_record = AudioChunk(
-                        audio_id=audio_id, chunk_text=chunk, embedding=embedding
-                    )
-                    db.add(chunk_record)
+            # Check token count before chunking
+            token_count = count_tokens(final_transcript)
+            print(f"Transcript token count: {token_count}")
 
-            db.commit()
-            print("Audio transcription completed successfully")
-
-            # After getting transcript:
-            try:
-                print("Chunking and embedding transcript...")
+            if token_count > 8000:
+                print("Transcript exceeds 8000 tokens, creating chunks...")
                 chunks = chunk_text(final_transcript)
                 for chunk in chunks:
                     embedding = create_embedding(chunk)
@@ -127,9 +116,11 @@ def process_audio_transcription(file_location: str, audio_id: str, db: Session):
                     )
                     db.add(chunk_record)
                 db.commit()
-                print("Transcript chunking and embedding completed successfully")
-            except Exception as e:
-                print(f"Error processing transcript chunks: {str(e)}")
+                print("Chunking and embedding completed")
+            else:
+                print("Transcript within token limit, no chunking needed")
+
+            print("Audio transcription completed successfully")
 
         except Exception as e:
             error_msg = f"Transcription error: {str(e)}"
